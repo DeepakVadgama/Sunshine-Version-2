@@ -1,8 +1,9 @@
 package com.example.android.sunshine.app;
 
-import android.support.v7.app.ActionBarActivity;
-import android.support.v4.app.Fragment;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
+import android.support.v7.app.ActionBarActivity;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -11,6 +12,12 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -22,7 +29,7 @@ public class MainActivity extends ActionBarActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         if (savedInstanceState == null) {
-            getSupportFragmentManager().beginTransaction().add(R.id.container, new PlaceholderFragment()).commit();
+            getSupportFragmentManager().beginTransaction().add(R.id.container, new ForecastFragment()).commit();
         }
     }
 
@@ -46,37 +53,5 @@ public class MainActivity extends ActionBarActivity {
         }
 
         return super.onOptionsItemSelected(item);
-    }
-
-    /**
-     * A placeholder fragment containing a simple view.
-     */
-    public static class PlaceholderFragment extends Fragment {
-
-        private ArrayAdapter<String> mForecastAdapter;
-
-        public PlaceholderFragment() {
-        }
-
-        @Override
-        public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-            View rootView = inflater.inflate(R.layout.fragment_main, container, false);
-
-            List<String> forecastData = new ArrayList<>();
-            forecastData.add("Today - Sunny - 88/63");
-            forecastData.add("Tomorrow - Cloudy - 88/63");
-            forecastData.add("Wednesday - Foggy - 88/63");
-            forecastData.add("Thursday - Rainy - 88/63");
-            forecastData.add("Friday - Too Bright - 88/63");
-            forecastData.add("Saturday - Sunny - 88/63");
-            forecastData.add("Sunday - Sunny - 88/63");
-
-            mForecastAdapter = new ArrayAdapter<>(getActivity(), R.layout.list_item_forecast, R.id.list_item_forecast_textview, forecastData);
-
-            ListView listItemView = (ListView) rootView.findViewById(R.id.list_view_forecast);
-            listItemView.setAdapter(mForecastAdapter);
-
-            return rootView;
-        }
     }
 }
