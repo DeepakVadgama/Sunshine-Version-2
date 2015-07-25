@@ -15,14 +15,31 @@ import android.widget.Toast;
 public class MainActivity extends ActionBarActivity {
 
     private static final String LOG_TAG = MainActivity.class.getSimpleName();
+    private static final String DETAILFRAGMENT_TAG = "DFTAG";
+    private boolean mTwoPane;
+    private String mLocation;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        Log.i(LOG_TAG, "*** on create *** ");
         super.onCreate(savedInstanceState);
+        mLocation = Utility.getPreferredLocation(this);
+
         setContentView(R.layout.activity_main);
-        if (savedInstanceState == null) {
-            getSupportFragmentManager().beginTransaction().add(R.id.container, new ForecastFragment()).commit();
+        if (findViewById(R.id.weather_detail_container) != null) {
+            // The detail container view will be present only in the large-screen layouts
+            // (res/layout-sw600dp). If this view is present, then the activity should be
+            // in two-pane mode.
+            mTwoPane = true;
+            // In two-pane mode, show the detail view in this activity by
+            // adding or replacing the detail fragment using a
+            // fragment transaction.
+            if (savedInstanceState == null) {
+                getSupportFragmentManager().beginTransaction()
+                        .replace(R.id.weather_detail_container, new DetailFragment(), DETAILFRAGMENT_TAG)
+                        .commit();
+            }
+        } else {
+            mTwoPane = false;
         }
     }
 
@@ -45,9 +62,7 @@ public class MainActivity extends ActionBarActivity {
             startActivity(new Intent(this, SettingsActivity.class));
             return true;
         } else if (item.getItemId() == R.id.action_viewmap) {
-            SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
-            String location = sharedPref.getString(getString(R.string.pref_location_key), getString(R.string.pref_location_default));
-
+            String location = Utility.getPreferredLocation(this);
             Uri geoLocation = Uri.parse("geo:0,0").buildUpon().appendQueryParameter("q", location).build();
             viewOnMap(geoLocation);
             return true;
@@ -70,31 +85,35 @@ public class MainActivity extends ActionBarActivity {
 
     @Override
     protected void onPause() {
-        Log.i(LOG_TAG, "**** on pause **** ");
         super.onPause();
     }
 
     @Override
     protected void onResume() {
-        Log.i(LOG_TAG, "**** on resume **** ");
         super.onResume();
+        String location = Utility.getPreferredLocation( this );
+        // update the location in our second pane using the fragment manager
+        if (location != null && !location.equals(mLocation)) {
+            ForecastFragment ff = (ForecastFragment)getSupportFragmentManager().findFragmentById(R.id.fragment_forecast);
+            if (null != ff ) {
+                ff.onLocationChanged();
+            }
+            mLocation = location;
+        }
     }
 
     @Override
     protected void onStop() {
-        Log.i(LOG_TAG, "**** on stop **** ");
         super.onStop();
     }
 
     @Override
     protected void onStart() {
-        Log.i(LOG_TAG, "**** on start **** ");
         super.onStart();
     }
 
     @Override
     protected void onDestroy() {
-        Log.i(LOG_TAG, "**** on destroy **** ");
         super.onDestroy();
     }
 }
